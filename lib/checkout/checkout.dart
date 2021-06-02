@@ -172,7 +172,7 @@ class _CheckoutState extends State<Checkout> {
                             Spacer(),
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.blue[700],
+                                primary: Colors.orange[700],
                                 padding: EdgeInsets.symmetric(
                                   horizontal: screenSize.width * 0.016,
                                   vertical: screenSize.height * 0.02,
@@ -205,7 +205,7 @@ class _CheckoutState extends State<Checkout> {
                             SizedBox(height: screenSize.height * 0.01),
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.blue[700],
+                                primary: Colors.orange[700],
                                 padding: EdgeInsets.symmetric(
                                   horizontal: screenSize.width * 0.07,
                                   vertical: screenSize.height * 0.02,
