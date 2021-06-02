@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:check_in_system/AdminPage/dashboard/admin_dashboard.dart';
 import 'package:check_in_system/AdminPage/dashboard/order_items.dart';
 import 'package:check_in_system/AdminPage/login/admin_login.dart';
+import 'package:check_in_system/checkout/checkout.dart';
 import 'package:check_in_system/demo2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
@@ -21,56 +22,49 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   Widget build(BuildContext context) {
     // print(Uri.base);
     // var url = window.location.href;
     // print('url $url');
     // print(url.split('#').last);
-    return  MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'POS Admin',
-          theme: ThemeData(
-            // This is the theme of your application.
-            //
-            // Try running your application with "flutter run". You'll see the
-            // application has a blue toolbar. Then, without quitting the app, try
-            // changing the primarySwatch below to Colors.green and then invoke
-            // "hot reload" (press "r" in the console where you ran "flutter run",
-            // or simply save your changes to "hot reload" in a Flutter IDE).
-            // Notice that the counter didn't reset back to zero; the application
-            // is not restarted.
-            primarySwatch: Colors.blue,
-          ),
-            initialRoute:  'adminLogin',
-            routes:  {
-            // 'BP' : (context)=> BusinessProfile(),
-            //   'dashboard' : (context) => AdminDashboard(),
-              'SP' : (context) => SidebarPage(),
-            //   'CustomerVisits' : (context) => CustomerVisits(),
-              'adminRegister' : (context) =>  AdminRegisterPage(),
-              'adminLogin' : (context) =>  AdminLoginPage(),
-              'HP' : (context) =>  HomePage(),
-              'TB' : (context) =>  ToggleButton(),
-              // 'cat' : (context) =>  Categories(),
-              // 'OI' : (context) =>  OrderItems(),
-              // 'HP' : (context) =>  HomePage(),
-              // 'TL' : (context) =>  TableLayout(),
-              // 'HP' : (context) =>  MyHomePage(),
-              // 'DIT' : (context) =>  DineInTables(),
-
-
-            },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'POS Admin',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // Try running your application with "flutter run". You'll see the
+        // application has a blue toolbar. Then, without quitting the app, try
+        // changing the primarySwatch below to Colors.green and then invoke
+        // "hot reload" (press "r" in the console where you ran "flutter run",
+        // or simply save your changes to "hot reload" in a Flutter IDE).
+        // Notice that the counter didn't reset back to zero; the application
+        // is not restarted.
+        primarySwatch: Colors.blue,
+      ),
+      initialRoute: 'adminLogin',
+      routes: {
+        // 'BP' : (context)=> BusinessProfile(),
+        //   'dashboard' : (context) => AdminDashboard(),
+        'SP': (context) => SidebarPage(),
+        //   'CustomerVisits' : (context) => CustomerVisits(),
+        'adminRegister': (context) => AdminRegisterPage(),
+        'adminLogin': (context) => AdminLoginPage(),
+        'HP': (context) => HomePage(),
+        'TB': (context) => ToggleButton(),
+        // 'cat' : (context) =>  Categories(),
+        // 'OI' : (context) =>  OrderItems(),
+        // 'HP' : (context) =>  HomePage(),
+        // 'TL' : (context) =>  TableLayout(),
+        // 'HP' : (context) =>  MyHomePage(),
+        // 'DIT' : (context) =>  DineInTables(),
+        'checkout': (context) => Checkout(),
+      },
       // home: AdminLoginPage(),
-        );
-      }
+    );
   }
-
-
-
-
-
+}
 
 // class HomePage extends StatefulWidget {
 //   @override
@@ -139,8 +133,6 @@ class _MyAppState extends State<MyApp> {
 //   }
 // }
 
-
-
 class TableLayout extends StatefulWidget {
   @override
   _TableLayoutState createState() => _TableLayoutState();
@@ -203,42 +195,50 @@ class _TableLayoutState extends State<TableLayout> {
             child: csvTable.isEmpty
                 ? Container()
                 : Table(
-              columnWidths: {
-                0: FixedColumnWidth(100.0),
-                1: FixedColumnWidth(200.0),
-              },
-              border: TableBorder.all(width: 1.0),
-              children: csvTable.map((item) {
-                return TableRow(
-                    children: item.map((row) {
-                      return Container(
-                        color: row.toString().contains("NA")
-                            ? Colors.red
-                            : Colors.green,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            row.toString(),
-                            style: TextStyle(fontSize: 20.0),
+                    columnWidths: {
+                      0: FixedColumnWidth(100.0),
+                      1: FixedColumnWidth(200.0),
+                    },
+                    border: TableBorder.all(width: 1.0),
+                    children: csvTable.map((item) {
+                      return TableRow(
+                          children: item.map((row) {
+                        return Container(
+                          color: row.toString().contains("NA")
+                              ? Colors.red
+                              : Colors.green,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              row.toString(),
+                              style: TextStyle(fontSize: 20.0),
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList());
-              }).toList(),
-            ),
+                        );
+                      }).toList());
+                    }).toList(),
+                  ),
           ),
-          csvTable.isEmpty ? Container():  TextButton(onPressed: (){
-            csvTable.forEach((element) {
-              print(element.length);
-              FirebaseFirestore.instance.collection('posshop').doc('demo').collection('democol').add({
-                'name' : element.length >= 1 ?  element[0] :'' ,
-                'phone' : element.length >= 2 ?  element[1] :'' ,
-                'Order ID' : element.length >= 3 ? element[2] : ''  ,
-                'date' : element.length >= 4 ? element[3] :'',
-                'time' : element.length >= 5 ? element[4] : '',
-              }).then((value) => print('firebase updated'));
-            });
-          }, child: Text('Save'))
+          csvTable.isEmpty
+              ? Container()
+              : TextButton(
+                  onPressed: () {
+                    csvTable.forEach((element) {
+                      print(element.length);
+                      FirebaseFirestore.instance
+                          .collection('posshop')
+                          .doc('demo')
+                          .collection('democol')
+                          .add({
+                        'name': element.length >= 1 ? element[0] : '',
+                        'phone': element.length >= 2 ? element[1] : '',
+                        'Order ID': element.length >= 3 ? element[2] : '',
+                        'date': element.length >= 4 ? element[3] : '',
+                        'time': element.length >= 5 ? element[4] : '',
+                      }).then((value) => print('firebase updated'));
+                    });
+                  },
+                  child: Text('Save'))
         ],
       ),
     );
