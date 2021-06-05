@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:check_in_system/AdminPage/dashboard/admin_dashboard.dart';
 import 'package:check_in_system/AdminPage/dashboard/order_items.dart';
 import 'package:check_in_system/AdminPage/login/admin_login.dart';
+import 'package:check_in_system/Table_Order_Online/table_order_online.dart';
 import 'package:check_in_system/demo2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
@@ -43,7 +44,7 @@ class _MyAppState extends State<MyApp> {
             // is not restarted.
             primarySwatch: Colors.blue,
           ),
-            initialRoute:  'adminLogin',
+            initialRoute:  'TOO',
             routes:  {
             // 'BP' : (context)=> BusinessProfile(),
             //   'dashboard' : (context) => AdminDashboard(),
@@ -53,6 +54,7 @@ class _MyAppState extends State<MyApp> {
               'adminLogin' : (context) =>  AdminLoginPage(),
               'HP' : (context) =>  HomePage(),
               'TB' : (context) =>  ToggleButton(),
+              'TOO' : (context) =>  TableOrderOnline(),
               // 'cat' : (context) =>  Categories(),
               // 'OI' : (context) =>  OrderItems(),
               // 'HP' : (context) =>  HomePage(),

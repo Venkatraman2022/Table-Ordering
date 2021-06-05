@@ -52,6 +52,17 @@ dependencies:
   multiselect_formfield: ^0.1.6
   dots_indicator: ^2.0.0
 
+
+
+
+
+  circular_profile_avatar: ^1.0.8
+  modal_bottom_sheet: ^2.0.0
+
+
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
