@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class TableOrderOnline extends StatefulWidget {
   const TableOrderOnline({Key key}) : super(key: key);
 
@@ -37,48 +37,54 @@ class _TableOrderOnlineState extends State<TableOrderOnline> {
     'Dosa',
     'Idly'
   ];
-  final List<double> itemPrice = [
-    12.12,
-    10.11,
-    15.12,
-    5.12,
-    10.12,
-    15.12,
-    11.11,
-    12.11,
-    4.11,
-    3.11
-  ];
-  final List<int> quantity = [
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-  ];
+
+  final List<int> quantity = [ ];
   int totalValue = 0;
+  String _search;
+  String _button = "All Items";
   List<String> addedToCart = [];
   List<double> addedPrice = [];
   List<double> cartPrice = [];
   List<int> addedQty = [];
   bool guestUserSignInSwitch = false;
   bool paymentType = false;
+  bool searchButton = false;
   Color defaultColor = Colors.blue;
   var maskFormatter = new MaskTextInputFormatter(
       mask: '+61 (##) ####-####', filter: {"#": RegExp(r'[0-9]')});
   TextEditingController _mobileController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
+  TextEditingController _searchController = TextEditingController();
   var _nameKey = GlobalKey<FormState>();
   var _mobileKey = GlobalKey<FormState>();
+
+
+  List<Color> _catBgColor = [
+    Color(0xFFF57C00),
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+  ];
+
+  List<Color> _catTextColor = [
+    Colors.white,
+    Color(0xFF9E9E9E),
+    Color(0xFF9E9E9E),
+    Color(0xFF9E9E9E),
+    Color(0xFF9E9E9E),
+    Color(0xFF9E9E9E),
+    Color(0xFF9E9E9E),
+    Color(0xFF9E9E9E),
+  ];
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final orientation = MediaQuery.of(context).orientation;
+
     return SafeArea(
       child: StatefulBuilder(builder: (context, StateSetter showState) {
         return MaterialApp(
@@ -224,201 +230,334 @@ class _TableOrderOnlineState extends State<TableOrderOnline> {
                                     ),
                                   )),
                             ),
-                            Container(
-                              // margin: EdgeInsets.all(10.0),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
+                            InkWell(
+                              onTap: (){
+                                setState(() {
+                                  searchButton = !searchButton;
+                                });
+                              },
+                              child: Container(
+                                // margin: EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black,
+                                      blurRadius: 2.0,
+                                      spreadRadius: 0.0,
+                                      offset: Offset(2.0,
+                                          2.0), // shadow direction: bottom right
+                                    )
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Icon(
+                                    Icons.search,
                                     color: Colors.black,
-                                    blurRadius: 2.0,
-                                    spreadRadius: 0.0,
-                                    offset: Offset(2.0,
-                                        2.0), // shadow direction: bottom right
-                                  )
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Icon(
-                                  Icons.search,
-                                  color: Colors.black,
-                                  size: size.height * 0.03,
+                                    size: size.height * 0.03,
+                                  ),
                                 ),
                               ),
                             )
                           ],
                         ),
                       ),
+                    searchButton == true ?  Container(
+                        height: size.width <= 500
+                            ? size.height * 0.05
+                            : size.height * 0.1,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        margin: EdgeInsets.only(
+                          left: size.width * 0.012,
+                          right: size.width * 0.012,
+                          bottom: size.width * 0.012,
+                        ),
+                        child: TextFormField(
+                          controller: _searchController,
+                          onChanged: (val) {
+                            setState(() {
+                              _search = val;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            prefixIcon: Icon(Icons.search),
+                            hintText: "Search",
+                          ),
+                        ),
+                      ) : Container(),
                       Container(
                         height: size.width <= 500
                             ? size.height * 0.05
                             : size.height * 0.1,
                         // width: size.width,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: catList.length,
-                          itemBuilder: (BuildContext ctxt, int index) {
-                            return Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    showState(() {
-                                      print(size.width);
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: size.width * 0.02,
-                                      vertical: size.height * 0.01,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey[400],
-                                          blurRadius: 2.0,
-                                          spreadRadius: 0.0,
-                                          offset: Offset(2.0,
-                                              2.0), // shadow direction: bottom right
-                                        )
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          catList[index],
-                                          style: TextStyle(
-                                            fontSize: size.width * 0.03,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal,
-                                          ),
+                        child: StreamBuilder(
+                          stream:  FirebaseFirestore.instance
+                              .collection('posshop')
+                              .doc('categories')
+                              .collection('category')
+                              .snapshots(),
+                          builder: (context,AsyncSnapshot snapshot) {
+                            if (!snapshot.hasData) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }else{
+
+                            catList.clear();
+                            catList.add('All Items');
+                            // setState(() {
+                            //
+                            // });
+                            for (var i = 0;
+                            i < snapshot.data.docs.length;
+                            i++) {
+                              catList.add(snapshot.data.docs[i]['category']);
+                              // print(catList);
+                            }
+                            // print(snapshot.data.docs[1]['category']);
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: catList.length  ,
+                              itemBuilder: (BuildContext ctxt, int index) {
+
+                                return Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        showState(() {
+                                          _button = catList[index];
+                                          for (var i = 0;
+                                          i < catList.length - 1;
+                                          i++) {
+                                            if (index == i) {
+                                              _catBgColor[i] =
+                                                  Color(0xFFF57C00);
+                                              _catTextColor[i] = Colors.white;
+                                            } else {
+                                              _catBgColor[i] = Colors.white;
+                                              _catTextColor[i] =
+                                                  Color(0xFF9E9E9E);
+                                            }
+                                          }
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: size.width * 0.02,
+                                          vertical: size.height * 0.01,
                                         ),
-                                      ],
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(10.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey[400],
+                                              blurRadius: 2.0,
+                                              spreadRadius: 0.0,
+                                              offset: Offset(2.0,
+                                                  2.0), // shadow direction: bottom right
+                                            )
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              catList[index],
+                                              style: TextStyle(
+                                                fontSize: size.width * 0.03,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                SizedBox(width: 10.0),
-                              ],
+                                    SizedBox(width: 10.0),
+                                  ],
+                                );
+                              },
                             );
-                          },
+                          }}
                         ),
                       ),
-                      GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount:
-                                (orientation == Orientation.portrait) ? 2 : 3),
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        itemCount: itemName.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Stack(
-                                  children: [
-                                    Card(
-                                      color: Colors.blue,
-                                      semanticContainer: true,
-                                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                                      child: Image.network(
-                                        "images/wel.png",
-                                        width: size.width,
-                                        height: size.height * 0.2,
-                                        // fit: BoxFit.contain,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      elevation: 5,
-                                      margin: EdgeInsets.all(10),
-                                    ),
-                                    Positioned(
-                                        bottom: size.width * 0.03,
-                                        right: size.width * 0.03,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.white,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black,
-                                                blurRadius: 2.0,
-                                                spreadRadius: 0.0,
-                                                offset: Offset(2.0,
-                                                    2.0), // shadow direction: bottom right
-                                              )
-                                            ],
+                      Container(
+                        child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection(
+                               'posshop')
+                                .doc("itemDetails")
+                                .collection('items')
+                                .orderBy('name')
+                                .snapshots(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                                  var filteredDocs = [];
+
+                                  if (!snapshot.hasData) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+
+                                  else {
+                                    for (int index = 0;
+                                    index < snapshot.data.docs.length;
+                                    index++) {
+                                      quantity.add(1);
+                                      List button = [];
+                                      String searchs =
+                                      snapshot.data.docs[index]['name'];
+                                      button.add(snapshot.data.docs[index]['cat']);
+
+                                      if (_searchController.text
+                                          .toLowerCase()
+                                          .isNotEmpty ||
+                                          _searchController.text.toLowerCase() != '') {
+                                        if (searchs.toLowerCase().contains(
+                                            _searchController.text.toLowerCase())) {
+                                          filteredDocs.add(snapshot.data.docs[index]);
+                                        }
+                                      } else {
+                                        if ((_button != null &&
+                                            button
+                                                .toString()
+                                                .toLowerCase()
+                                                .contains(_button.toLowerCase())) ||
+                                            _button == "All Items") {
+                                          filteredDocs.add(snapshot.data.docs[index]);
+                                        }
+                                      }
+                                    }
+                                  }
+                            return GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount:
+                                      (orientation == Orientation.portrait) ? 2 : 3),
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              itemCount: filteredDocs.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Stack(
+                                        children: [
+                                          Card(
+                                            color: Colors.blue,
+                                            semanticContainer: true,
+                                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                                            child: Image.network(
+                                               "images/wel.png",
+                                              width: size.width,
+                                              height: size.height * 0.2,
+                                              // fit: BoxFit.contain,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            elevation: 5,
+                                            margin: EdgeInsets.all(10),
                                           ),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              showState(() {
-                                                addedToCart.contains(
-                                                        itemName[index])
-                                                    ? totalValue -= 1
-                                                    : totalValue += 1;
+                                          Positioned(
+                                              bottom: size.width * 0.03,
+                                              right: size.width * 0.03,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.white,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black,
+                                                      blurRadius: 2.0,
+                                                      spreadRadius: 0.0,
+                                                      offset: Offset(2.0,
+                                                          2.0), // shadow direction: bottom right
+                                                    )
+                                                  ],
+                                                ),
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    showState(() {
+                                                      addedToCart.contains(
+                                                              filteredDocs[index]['name'])
+                                                          ? totalValue -= 1
+                                                          : totalValue += 1;
 
-                                                addedToCart.contains(
-                                                        itemName[index])
-                                                    ? addedToCart
-                                                        .remove(itemName[index])
-                                                    : addedToCart
-                                                        .add(itemName[index]);
 
-                                                addedToCart.contains(
-                                                        itemName[index])
-                                                    ? addedPrice
-                                                        .add(itemPrice[index])
-                                                    : addedPrice.remove(
-                                                        itemPrice[index]);
 
-                                                addedToCart.contains(
-                                                        itemName[index])
-                                                    ? cartPrice
-                                                        .add(itemPrice[index])
-                                                    : cartPrice.remove(
-                                                        itemPrice[index]);
+                                                      addedToCart.contains(
+                                                          filteredDocs[index]['name'])
+                                                          ? addedToCart
+                                                              .remove( filteredDocs[index]['name'])
+                                                          : addedToCart
+                                                              .add( filteredDocs[index]['name']);
+                                                      //
+                                                      addedToCart.contains(
+                                                          filteredDocs[index]['name'])
+                                                          ? addedPrice
+                                                              .add(filteredDocs[index]['price'])
+                                                          : addedPrice.remove(
+                                                          filteredDocs[index]['price']);
 
-                                                addedToCart.contains(
-                                                        itemName[index])
-                                                    ? addedQty
-                                                        .add(quantity[index])
-                                                    : addedQty.remove(
-                                                        quantity[index]);
+                                                      addedToCart.contains(
+                                                          filteredDocs[index]['name'])
+                                                          ? cartPrice
+                                                              .add(filteredDocs[index]['price'])
+                                                          : cartPrice.remove(
+                                                          filteredDocs[index]['price']);
 
-                                                print(addedToCart);
-                                                print(addedPrice);
-                                                print(totalValue);
-                                                print(addedQty);
-                                              });
-                                            },
-                                            icon: Icon(addedToCart
-                                                    .contains(itemName[index])
-                                                ? Icons.check
-                                                : Icons.add),
-                                            color: Colors.black,
-                                          ),
-                                        ))
-                                  ],
-                                ),
-                                ListTile(
-                                  title: Text(
-                                    itemName[index],
+                                                      addedToCart.contains(
+                                                          filteredDocs[index]['name'])
+                                                          ? addedQty
+                                                              .add(quantity[index])
+                                                          : addedQty.remove(
+                                                              quantity[index]);
+
+                                                      print(addedToCart);
+                                                      print(addedPrice);
+                                                      // print(totalValue);
+                                                      print(addedQty);
+                                                    });
+                                                  },
+                                                  icon: Icon(addedToCart
+                                                          .contains(filteredDocs[index]['name'])
+                                                      ? Icons.check
+                                                      : Icons.add),
+                                                  color: Colors.black,
+                                                ),
+                                              ))
+                                        ],
+                                      ),
+                                      ListTile(
+                                        title: Text(
+                                          filteredDocs[index]['name'],
+                                        ),
+                                        subtitle: Text(
+                                filteredDocs[index]['price'].toString(),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  subtitle: Text(
-                                    itemPrice[index].toString(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                                );
+                              },
+                            );
+                          }
+                        ),
                       ),
                     ],
                   ),
@@ -431,8 +570,6 @@ class _TableOrderOnlineState extends State<TableOrderOnline> {
 
   cartPopup() {
     Size size = MediaQuery.of(context).size;
-    print(itemPrice);
-    print(itemName);
     // cartPrice = addedPrice;
     return showModalBottomSheet(
       isDismissible: true,

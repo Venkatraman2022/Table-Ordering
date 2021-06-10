@@ -58,6 +58,7 @@ dependencies:
 
   circular_profile_avatar: ^1.0.8
   modal_bottom_sheet: ^2.0.0
+  cached_network_image:
 
 
 
